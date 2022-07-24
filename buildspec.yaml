@@ -4,12 +4,12 @@ env:
   shell: bash
   variables:
     SYNOPSYS_IO_Workflow_Engine_Version : '2022.4.1'
-    SYNOPSYS_IO_io_server_token: ABR5FQ5NFVA2FEZ5SDOGS4VZDDQCFF7WEA4MIYYDV5RUKRM7CI5A====
+    SYNOPSYS_IO_io_server_token: ${{secret.IO_ACCESS_TOKEN}}
     SYNOPSYS_IO_project_name: 'aws-io-sample'
     SYNOPSYS_IO_io_server_url: 'https://io10.codedx.synopsys.com'
     SYNOPSYS_IO_persona_type: devsecops
     SYNOPSYS_IO_polaris_instanceurl: 'https://sipse.polaris.synopsys.com'
-    SYNOPSYS_IO_polaris_authtoken: '3hp50qms7h4bl1crmn41agv1ioev7hb5e3n8mbg4kv4000t086v0'
+    SYNOPSYS_IO_polaris_authtoken: ${{secret.POLARIS_TOKEN}}
     SYNOPSYS_IO_polaris_projectName: 'aws-insecure-bank'
     SYNOPSYS_IO_sigma_downloadurl: <sigma_download_url>
     SYNOPSYS_IO_Jira_HostUrl: <jira_host_url>
@@ -26,11 +26,11 @@ env:
     SYNOPSYS_IO_scm_owner: ozviper
     SYNOPSYS_IO_scm_repository_name: 'insecure-bank'
     SYNOPSYS_IO_scm_repository_branch_name: aws
-    SYNOPSYS_IO_github_token: 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
+    SYNOPSYS_IO_github_token: ${{secrets.GITHUB_ACCESS}}
     SYNOPSYS_IO_github_username: ozviper
     SYNOPSYS_IO_github_apiUrl: 'https://api.github.com/repos'
     SYNOPSYS_IO_project_release_type: <project_release_type>
-    SYNOPSYS_IO_Blackduck_AuthToken: NThlNmJkYmYtZGVmMi00NjUxLTg4ZTEtNDI0Zjk3ZjI2OThkOjUzZGU2NTJiLTE3ZTEtNDU3NS05ZTA2LTY5MjU1MmEyODhkNg==
+    SYNOPSYS_IO_Blackduck_AuthToken: ${{secret.BLACKDUCK_TOKEN}}
     SYNOPSYS_IO_Blackduck_ProjectName: 'aws-insecure-bank'
     SYNOPSYS_IO_Blackduck_InstanceUrl: 'https://testing.blackduck.synopsys.com'
     SYNOPSYS_IO_Blackduck_ProjectVersion: aws
