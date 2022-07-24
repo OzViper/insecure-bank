@@ -28,12 +28,14 @@ Resources:
                 Action:
                   - 's3:GetObject'
                   - 's3:GetObjectVersion'
-                Resource: '*'
+                Resource: 
+                  - '*'
               - Sid: S3PutObjectPolicy
                 Effect: Allow
                 Action:
                   - 's3:PutObject'
-                Resource: '*'
+                Resource: 
+                  - '*'
               - Sid: S3BucketIdentity
                 Effect: Allow
                 Action:
@@ -41,9 +43,6 @@ Resources:
                   - 's3:GetBucketLocation'
                 Resource:
                   - '*'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 276585a6-4d4c-4b21-a731-9092f99f6cd3
   CodeBuildSourceCredential:
     Type: 'AWS::CodeBuild::SourceCredential'
     Properties:
