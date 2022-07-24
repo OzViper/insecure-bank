@@ -74,7 +74,7 @@ Resources:
                 PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED,
                 PULL_REQUEST_REOPENED
             - Type: BASE_REF
-              Pattern: !Sub ^refs/heads/aws$
+              Pattern: !Sub ^refs/heads/AWS$
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
