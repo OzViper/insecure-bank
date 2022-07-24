@@ -66,38 +66,7 @@ phases:
       - echo ======= IO Prescription Stage =============
       - |
         io_client-$ioClientVersion-$Runner_OS_Type/io --stage io
-        - Is_SAST_Enabled=$(jq -r '.Data.Prescription.Security.Activities.Sast.Enabled' io_state.json)
-        - Is_SASTPlusM_Enabled=$(jq -r '.Data.Prescription.Security.Activities.SastPlusM.Enabled' io_state.json)
-        - Is_SCA_Enabled=$(jq -r '.Data.Prescription.Security.Activities.Sca.Enabled' io_state.json)
-        - Is_DAST_Enabled=$(jq -r '.Data.Prescription.Security.Activities.Dast.Enabled' io_state.json)
-        - Is_DASTPlusM_Enabled=$(jq -r '.Data.Prescription.Security.Activities.DastPlusM.Enabled' io_state.json)
-        - Is_IMAGESCAN_Enabled=$(jq -r '.Data.Prescription.Security.Activities.ImageScan.Enabled' io_state.json)
-        - BIZ_CRIT_SCORE=$(jq -r '.Data.Prescription.RiskScore.BusinessCriticalityScore' io_state.json)
-        - DATA_CLASS_SCORE=$(jq -r '.Data.Prescription.RiskScore.DataClassScore' io_state.json)
-        - ACCESS_SCORE=$(jq -r '.Data.Prescription.RiskScore.AccessScore' io_state.json)
-        - OPEN_VULN_SCORE=$(jq -r '.Data.Prescription.RiskScore.OpenVulnerabilityScore' io_state.json)
-        - CHANGE_SIG_SCORE=$(jq -r '.Data.Prescription.RiskScore.ChangeSignificanceScore' io_state.json)
-
-        echo "================================== IO Prescription ======================================="
-        echo "Is SAST Enabled - $Is_SAST_Enabled"
-        echo "Is SCA Enabled - $Is_SCA_Enabled"
-        echo "Is DAST Enabled - ${Is_DAST_Enabled}"
-        echo "Is Image Scan Enabled - ${Is_IMAGESCAN_Enabled}"
-        echo "Is Source Code Review - Manual (SAST+M) Enabled - ${Is_SASTPlusM_Enabled}"
-        echo "Is Penetration Testing - Manual (DAST+M) Enabled - ${Is_DASTPlusM_Enabled}"
-        if [ $SYNOPSYS_IO_persona_type == "devsecops" ]; then
-            echo "==================================== IO Risk Score ======================================="
-            echo "Business Criticality Score - ${BIZ_CRIT_SCORE}"
-            echo "Data Class Score - ${DATA_CLASS_SCORE}"
-            echo "Access Score - ${ACCESS_SCORE}"
-            echo "Open Vulnerability Score - ${OPEN_VULN_SCORE}"
-            echo "Change Significance Score - ${CHANGE_SIG_SCORE}"
-            export bizScore=$(echo $BIZ_CRIT_SCORE | cut -d'/' -f2)
-            export dataScore=$(echo $DATA_CLASS_SCORE | cut -d'/' -f2)
-            export accessScore=$(echo $ACCESS_SCORE | cut -d'/' -f2)
-            export vulnScore=$(echo $OPEN_VULN_SCORE | cut -d'/' -f2)
-            export changeScore=$(echo $CHANGE_SIG_SCORE | cut -d'/' -f2)
-            echo -n "Total Score - " && echo "$bizScore + $dataScore + $accessScore + $vulnScore + $changeScore" | bc
+        echo "==================================== IO Risk Score ======================================="
         fi
   build:
     commands:
