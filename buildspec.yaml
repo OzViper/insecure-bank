@@ -67,7 +67,6 @@ phases:
       - |
         io_client-$ioClientVersion-$Runner_OS_Type/io --stage io
         echo "==================================== IO Risk Score ======================================="
-        fi
   build:
     commands:
       - echo ================Build Maven Package and Docker Image================
