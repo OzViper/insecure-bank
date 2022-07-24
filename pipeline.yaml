@@ -41,13 +41,19 @@ Resources:
                   - 's3:GetBucketLocation'
                 Resource:
                   - '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 276585a6-4d4c-4b21-a731-9092f99f6cd3
   CodeBuildSourceCredential:
-    Type: AWS::CodeBuild::SourceCredential
+    Type: 'AWS::CodeBuild::SourceCredential'
     Properties:
-        AuthType: PERSONAL_ACCESS_TOKEN
-        ServerType: GITHUB
-        Token: "{{resolve:secretsmanager:GITHUB.ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}"
-        
+      AuthType: PERSONAL_ACCESS_TOKEN
+      ServerType: GITHUB
+      Token: >-
+        {{resolve:secretsmanager:GITHUB.ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e7d6c69d-f7de-44ba-83dc-796a649a7d4a
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -55,22 +61,21 @@ Resources:
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Service:
         Type: GITHUB
-        Location: https://github.com/OzViper/insecure-bank.git
+        Location: 'https://github.com/OzViper/insecure-bank.git'
         BuildSpec: Buildspec.yaml
         Auth:
-            Type: OAUTH
-            Resource: !Ref CodeBuildSourceCredential
+          Type: OAUTH
+          Resource: !Ref CodeBuildSourceCredential
       Artifacts:
         Type: NO_ARTIFACTS
       Triggers:
         Webhook: true
         FilterGroups:
-            - - Type: EVENT
-                Pattern: PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED
-              - Type: BASE_REF
-                Pattern: !Sub ^refs/heads/aws$
+          - - Type: EVENT
+              Pattern: 'PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED'
+            - Type: BASE_REF
+              Pattern: !Sub ^refs/heads/aws$
       Enviroment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/ubuntu-base:14.04
-        
+        Image: aws/codebuild/standard:4.0
