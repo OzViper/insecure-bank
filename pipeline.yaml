@@ -49,11 +49,7 @@ Resources:
     Properties:
       AuthType: PERSONAL_ACCESS_TOKEN
       ServerType: GITHUB
-      Token: >-
-        {{resolve:secretsmanager:GITHUB.ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: e7d6c69d-f7de-44ba-83dc-796a649a7d4a
+      Token: '{{resolve:secretsmanager:GITHUB.ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}'
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
