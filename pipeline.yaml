@@ -44,7 +44,7 @@ Resources:
                 Resource:
                   - '*'
   CodeBuildSourceCredential:
-    Type: 'AWS::CodeBuild::SourceCredential'
+    Type: AWS::CodeBuild::SourceCredential
     Properties:
       AuthType: PERSONAL_ACCESS_TOKEN
       ServerType: GITHUB
