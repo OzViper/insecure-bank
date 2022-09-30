@@ -7,7 +7,7 @@ def fileBranchName = 'master'
 // IO Environment
 def ioPOCId = 'io-10-poc'
 def ioProjectName = fileProjectName
-def ioWorkflowEngineVersion = '2022.4.1'
+def ioWorkflowEngineVersion = '2022.7.0'
 def ioServerURL = "https://io10.codedx.synopsys.com"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
@@ -32,8 +32,8 @@ def blackDuckProjectVersion = fileBranchName
 def jiraAssignee = 'johnd'
 def jiraConfigName = 'jira-poc10'
 def jiraIssueQuery = 'resolution=Unresolved'
-def jiraProjectKey = 'IRMOB'
-def jiraProjectName = 'IRMOB'
+def jiraProjectKey = 'IO-IRMOB'
+def jiraProjectName = 'IO-IRMOB'
 
 // Code Dx Configuration
 def codeDxConfigName = 'poc10-codedx'
