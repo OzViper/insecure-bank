@@ -5,14 +5,14 @@ import groovy.json.JsonSlurper
 def fileProjectName = 'my-insecure-bank'
 def fileBranchName = 'master'
 // IO Environment
-def ioPOCId = 'io-10-poc'
+def ioPOCId = 'io-poc10'
 def ioProjectName = fileProjectName
 def ioWorkflowEngineVersion = '2022.4.1'
 def ioServerURL = "https://io10.codedx.synopsys.com"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
 // SCM - GitHub
-def gitHubPOCId = 'poc10-github'
+def gitHubPOCId = 'github-poc10'
 def gitHubOwner = 'OzViper'
 def scmBranch = fileBranchName
 def scmRepoName = 'insecure-bank'
@@ -36,7 +36,7 @@ def jiraProjectKey = 'IO-IRMOB'
 def jiraProjectName = 'IO-IRMOB'
 
 // Code Dx Configuration
-def codeDxConfigName = 'poc10-codedx'
+def codeDxConfigName = 'codedx-poc10'
 def codeDxProjectId = '2'
 def codeDxInstnceURL = 'https://poc10.codedx.synopsys.com/codedx'
 def codeDxProjectAPI = '/api/projects/'
