@@ -2,7 +2,7 @@
 // - Black Duck INTELLIGENT scan on pushes and RAPID scan on PRs to "important" branches
 // - Coverity on Polaris FULL scan on pushes and PRs to "important" branches
 pipeline {
-    agent { label 'linux64' }
+    agent any
     environment {
         // production branches on which we want security reports
         PRODUCTION = "${env.BRANCH_NAME ==~ /^(stage|release)$/ ? 'true' : 'false'}"
@@ -17,7 +17,6 @@ pipeline {
     }
     tools {
         maven 'maven'
-        jdk 'JDK'
     }
     stages {
         stage('Build') {
