@@ -30,7 +30,7 @@ def blackDuckProjectVersion = fileBranchName
 
 // BTS Configuration
 def jiraAssignee = 'johnd'
-def jiraConfigName = 'jira-poc'
+def jiraConfigName = 'JIRA_TOKEN'
 def jiraIssueQuery = 'resolution=Unresolved'
 def jiraProjectKey = 'INBANK'
 def jiraProjectName = 'INBANK'
