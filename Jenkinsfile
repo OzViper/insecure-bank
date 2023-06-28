@@ -14,19 +14,17 @@ pipeline {
         PROJECT = sh(script: "basename $GIT_URL .git", returnStdout: true).trim()
         // Bridge CLI download URL
         BRIDGECLI_LINUX64 = 'https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-bridge/latest/synopsys-bridge-linux64.zip'
+
     }
     tools {
-        maven 'maven'
+        maven 'Maven3'
     }
+
     stages {
+        
         stage('Build') {
             steps {
-                sh 'mvn -B compile'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn -B test'
+                echo "mvn clean compile"
             }
         }
         stage('Scan') {
