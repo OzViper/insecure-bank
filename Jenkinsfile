@@ -12,19 +12,19 @@ def ioServerURL = "https://io263.codedx.synopsys.com"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
 // SCM - GitHub
-def gitHubPOCId = 'github-poc'
+def gitHubPOCId = 'GITHUB_TOKEN'
 def gitHubOwner = 'OzViper'
 def scmBranch = fileBranchName
 def scmRepoName = 'insecure-bank'
 def scmRevisionDate = ''
 
 // AST - Polaris
-def polarisConfigName = 'polaris-sipse'
+def polarisConfigName = 'POLARIS_ACCESS_TOKEN'
 def polarisProjectName = fileProjectName
 def polarisBranchName = fileBranchName
 
 // AST - Black Duck
-def blackDuckPOCId = 'blackduck-poc263'
+def blackDuckPOCId = 'BRIDGE_BLACKDUCK_TOKEN'
 def blackDuckProjectName = fileProjectName
 def blackDuckProjectVersion = fileBranchName
 
@@ -36,7 +36,7 @@ def jiraProjectKey = 'INBANK'
 def jiraProjectName = 'INBANK'
 
 // Code Dx Configuration
-def codeDxConfigName = 'codedx-poc'
+def codeDxConfigName = 'CODEDX_TOKEN'
 def codeDxProjectId = '2'
 def codeDxInstnceURL = 'https://poc263.codedx.synopsys.com/codedx'
 def codeDxProjectAPI = '/api/projects/'
