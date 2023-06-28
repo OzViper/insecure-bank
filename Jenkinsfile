@@ -1,255 +1,144 @@
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-
-// File Enviroment
-def fileProjectName = 'my-insecure-bank'
-def fileBranchName = 'master'
-// IO Environment
-def ioPOCId = 'io-poc10'
-def ioProjectName = fileProjectName
-def ioWorkflowEngineVersion = '2022.4.1'
-def ioServerURL = "https://io10.codedx.synopsys.com"
-def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
-
-// SCM - GitHub
-def gitHubPOCId = 'github-poc10'
-def gitHubOwner = 'OzViper'
-def scmBranch = fileBranchName
-def scmRepoName = 'insecure-bank'
-def scmRevisionDate = ''
-
-// AST - Polaris
-def polarisConfigName = 'polaris-sipse'
-def polarisProjectName = fileProjectName
-def polarisBranchName = fileBranchName
-
-// AST - Black Duck
-def blackDuckPOCId = 'blackduck-testing'
-def blackDuckProjectName = fileProjectName
-def blackDuckProjectVersion = fileBranchName
-
-// BTS Configuration
-def jiraAssignee = 'johnd'
-def jiraConfigName = 'jira-poc10'
-def jiraIssueQuery = 'resolution=Unresolved'
-def jiraProjectKey = 'INBANK'
-def jiraProjectName = 'INBANK'
-
-// Code Dx Configuration
-def codeDxConfigName = 'codedx-poc10'
-def codeDxProjectId = '2'
-def codeDxInstnceURL = 'https://poc10.codedx.synopsys.com/codedx'
-def codeDxProjectAPI = '/api/projects/'
-def codeDxAnalysisEndpoint = '/analysis'
-def codeDxProjectContext = codeDxProjectId + ';branch=' + fileBranchName
-def codeDxBranchAnalysisAPI = codeDxInstnceURL + codeDxProjectAPI + codeDxProjectId + codeDxAnalysisEndpoint
-
-// Notification Configuration
-def slackConfigName = ''
-def msTeamsConfigName = ''
-
-// IO Prescription Placeholders
-def runId
-def isSASTEnabled
-def isSASTPlusMEnabled
-def isSCAEnabled
-def isDASTEnabled
-def isDASTPlusMEnabled
-def isImageScanEnabled
-def isNetworkScanEnabled
-def isCloudReviewEnabled
-def isThreatModelEnabled
-def isInfraReviewEnabled
-def breakBuild
-
+// Example Jenkinsfile with SIG Security Scan that implements:
+// - Black Duck INTELLIGENT scan on pushes and RAPID scan on PRs to "important" branches
+// - Coverity on Polaris FULL scan on pushes and PRs to "important" branches
 pipeline {
-    agent any
-
-    tools {
-        maven 'Maven3'
+    agent { label 'linux64' }
+    environment {
+        // production branches on which we want security reports
+        PRODUCTION = "${env.BRANCH_NAME ==~ /^(stage|release)$/ ? 'true' : 'false'}"
+        // full scan on pushes to important branches
+        FULLSCAN = "${env.BRANCH_NAME ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
+        // PR scan on pulll requests to important branches
+        PRSCAN = "${env.CHANGE_TARGET ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
+        // set project name to be repo name
+        PROJECT = sh(script: "basename $GIT_URL .git", returnStdout: true).trim()
+        // Bridge CLI download URL
+        BRIDGECLI_LINUX64 = 'https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-bridge/latest/synopsys-bridge-linux64.zip'
     }
-
+    tools {
+        maven 'maven'
+        jdk 'JDK'
+    }
     stages {
-        
         stage('Build') {
             steps {
-                echo "mvn clean compile"
+                sh 'mvn -B compile'
             }
         }
-
-        // Get prescription from IO
-        stage('Prescription') {
-            environment {
-                IO_ACCESS_TOKEN = credentials("${ioPOCId}")
-            }
+        stage('Test') {
             steps {
-                synopsysIO(connectors: [
-                    io(
-                        configName: ioPOCId,
-                        projectName: ioProjectName,
-                        workflowVersion: ioWorkflowEngineVersion),
-                    github(
-                        branch: scmBranch,
-                        configName: gitHubPOCId,
-                        owner: gitHubOwner,
-                        repositoryName: scmRepoName),
-                    jira(
-                        assignee: jiraAssignee,
-                        configName: jiraConfigName,
-                        issueQuery: jiraIssueQuery,
-                        projectKey: jiraProjectKey,
-                        projectName: jiraProjectName)
-                    ]) {
-                        sh 'io --stage io'
+                sh 'mvn -B test'
+            }
+        }
+        stage('Scan') {
+            parallel {
+                stage('Black Duck Full Scan') {
+                    when { environment name: 'FULLSCAN', value: 'true' }
+                    environment {
+                        DETECT_PROJECT_NAME = "$PROJECT"
+                        DETECT_PROJECT_VERSION_NAME = "$BRANCH_NAME"
+                        DETECT_CODE_LOCATION_NAME = "$PROJECT-$BRANCH_NAME"
+                        DETECT_RISK_REPORT_PDF = "${env.PRODUCTION == 'true' ? 'true' : 'false'}"
+                        DETECT_EXCLUDED_DETECTOR_TYPES = 'GIT'
                     }
-
-                script {
-                    // IO-IQ will write the prescription to io_state JSON
-                    if (fileExists('io_state.json')) {
-                        def prescriptionJSON = readJSON file: 'io_state.json'
-
-                        // Pretty-print Prescription JSON
-                        // def prescriptionJSONFormat = JsonOutput.toJson(prescriptionJSON)
-                        // prettyJSON = JsonOutput.prettyPrint(prescriptionJSONFormat)
-                        // echo("${prettyJSON}")
-
-                        // Use the run Id from IO IQ to get detailed message/explanation on prescription
-                        runId = prescriptionJSON.data.io.run.id
-                        def apiURL = ioServerURL + ioRunAPI + runId
-                        def res = sh(script: "curl --location --request GET ${apiURL} --header 'Authorization: Bearer ${IO_ACCESS_TOKEN}'", returnStdout: true)
-
-                        def jsonSlurper = new JsonSlurper()
-                        def ioRunJSON = jsonSlurper.parseText(res)
-                        def ioRunJSONFormat = JsonOutput.toJson(ioRunJSON)
-                        def ioRunJSONPretty = JsonOutput.prettyPrint(ioRunJSONFormat)
-                        print("==================== IO-IQ Explanation ======================")
-                        echo("${ioRunJSONPretty}")
-                        print("==================== IO-IQ Explanation ======================")
-
-                        // Update security flags based on prescription
-                        isSASTEnabled = prescriptionJSON.data.prescription.security.activities.sast.enabled
-                        isSASTPlusMEnabled = prescriptionJSON.data.prescription.security.activities.sastPlusM.enabled
-                        isSCAEnabled = prescriptionJSON.data.prescription.security.activities.sca.enabled
-                        isDASTEnabled = prescriptionJSON.data.prescription.security.activities.dast.enabled
-                        isDASTPlusMEnabled = prescriptionJSON.data.prescription.security.activities.dastPlusM.enabled
-                        isImageScanEnabled = prescriptionJSON.data.prescription.security.activities.imageScan.enabled
-                        isNetworkScanEnabled = prescriptionJSON.data.prescription.security.activities.NETWORK.enabled
-                        isCloudReviewEnabled = prescriptionJSON.data.prescription.security.activities.CLOUD.enabled
-                        isThreatModelEnabled = prescriptionJSON.data.prescription.security.activities.THREATMODEL.enabled
-                        isInfraReviewEnabled = prescriptionJSON.data.prescription.security.activities.INFRA.enabled
-                    } else {
-                        error('IO prescription JSON not found.')
-                    }
-                }
-            }
-        }
-
-        // SAST
-        stage('SAST') {
-            when {
-                expression { isSASTEnabled }
-            }
-            steps {
-                echo 'Running SAST using Polaris'
-                synopsysIO(connectors: [
-                    polaris(
-                        configName: polarisConfigName, 
-                        projectName: polarisProjectName,
-                        branchName: polarisBranchName)]) {
-                            sh 'io --stage execution --state io_state.json'
-                }
-            }
-        }
-
-        // SCA
-        stage('SCA') {
-            when {
-                expression { isSCAEnabled }
-            }
-            steps {
-                echo 'Running SCA using Blac kDuck'
-                synopsysIO(connectors: [
-                    blackduck(
-                        configName: blackDuckPOCId,
-                        projectName: blackDuckProjectName,
-                        projectVersion: blackDuckProjectVersion)]) {
-                            sh 'io --stage execution --state io_state.json'
-                }
-            }
-        }
-
-        // Manual SAST Stage
-        stage('SAST+M') {
-            when {
-                expression { isSASTPlusMEnabled }
-            }
-            steps {
-                input message: 'High risk score or significant code-change detected. Perform manual secure code-review.'
-            }
-        }
-
-        // Run IO's Workflow Engine
-        stage('Workflow') {
-            environment {
-                CODEDX_ACCESS_TOKEN = credentials("${codeDxConfigName}")
-            }
-            steps {
-                script {
-                    print("========================== Code Dx Branch Analysis ============================")
-                    def res = sh(script: "curl --location --request POST ${codeDxBranchAnalysisAPI} --header 'Authorization: Bearer ${CODEDX_ACCESS_TOKEN}' --form 'filenames=\"\"' --form 'includeGitSource=\"\"' --form 'gitBranchName=\"\"' --form 'branchName=${fileBranchName}'", returnStdout: true)
-                    echo("${res}")
-                    print("========================== Code Dx Branch Analysis ============================")
-                }
-                synopsysIO(connectors: [
-                 /*   slack(configName: slackConfigName),
-                    msteams(configName: msTeamsConfigName)*/ ]) {
-                        sh 'io --stage workflow --state io_state.json' 
-               } 
-            }
-        } 
-
-        // Security Sign-Off Stage
-        stage('Security') {
-            steps {
-                script {
-                    if (fileExists('wf-output.json')) {
-                        def wfJSON = readJSON file: 'wf-output.json'
-
-                        // If the Workflow Output JSON has a lot of key-values; Jenkins throws a StackOverflow Exception
-                        //  when trying to pretty-print the JSON
-                        // def wfJSONFormat = JsonOutput.toJson(wfJSON)
-                        // def wfJSONPretty = JsonOutput.prettyPrint(wfJSONFormat)
-                        // print("======================== IO Workflow Engine Summary ==========================")
-                        // print(wfJSONPretty)
-                        // print("======================== IO Workflow Engine Summary ==========================")
-
-                        breakBuild = wfJSON.breaker.status
-                        print("========================== Build Breaker Status ============================")
-                        print("Breaker Status: $breakBuild")
-                        print("========================== Build Breaker Status ============================")
-
-                        if (breakBuild) {
-                            input message: 'Build-breaker criteria met.'
+                    steps {
+                        withCredentials([string(credentialsId: 'testing.blackduck.synopsys.com', variable: 'BRIDGE_BLACKDUCK_TOKEN')]) {
+                            script {
+                                status = sh returnStatus: true, script: """
+                                    curl -fLsS -o bridge.zip $BRIDGECLI_LINUX64 && unzip -qo -d $WORKSPACE_TMP bridge.zip && rm -f bridge.zip
+                                    $WORKSPACE_TMP/synopsys-bridge --verbose --stage blackduck \
+                                        blackduck.url=$BLACKDUCK_URL \
+                                        blackduck.scan.failure.severities='BLOCKER' \
+                                        blackduck.scan.full='true'
+                                """
+                                if (status == 8) { unstable 'policy violation' }
+                                else if (status != 0) { error 'scan failure' }
+                            }
                         }
-                    } else {
-                        print('No output from the Workflow Engine. No sign-off required.')
                     }
                 }
+                stage('Black Duck PR Scan') {
+                    // Bridge CLI PR comments currently not supported from Jenkins - see INTEGRATE-23
+                    when { environment name: 'PRSCAN', value: 'true' }
+                    environment {
+                        DETECT_PROJECT_NAME = "$PROJECT"
+                        DETECT_PROJECT_VERSION_NAME = "$CHANGE_TARGET"
+                        DETECT_CODE_LOCATION_NAME = "$PROJECT-$CHANGE_TARGET"
+                        DETECT_EXCLUDED_DETECTOR_TYPES = 'GIT'
+                        BRIDGE_ENVIRONMENT_SCAN_PULL = 'true'
+                    }
+                    steps {
+                        withCredentials([string(credentialsId: 'testing.blackduck.synopsys.com', variable: 'BRIDGE_BLACKDUCK_TOKEN'),
+                                         string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
+                            script {
+                                status = sh returnStatus: true, script: """
+                                    curl -fLsS -o bridge.zip $BRIDGECLI_LINUX64 && unzip -qo -d $WORKSPACE_TMP bridge.zip && rm -f bridge.zip
+                                    $WORKSPACE_TMP/synopsys-bridge --verbose --stage blackduck \
+                                        blackduck.url=$BLACKDUCK_URL \
+                                        blackduck.scan.full='false' \
+                                        blackduck.automation.prcomment='true' \
+                                        github.repository.branch.name=$BRANCH_NAME \
+                                        github.repository.name=$PROJECT \
+                                        github.repository.owner.name=$CHANGE_AUTHOR \
+                                        github.repository.pull.number=$CHANGE_ID \
+                                        github.user.token=$GITHUB_TOKEN
+                                """
+                                if (status == 8) { unstable 'policy violation' }
+                                else if (status != 0) { error 'scan failure' }
+                            }
+                        }
+                    }
+                }
+                stage('Coverity on Polaris Full Scan') {
+                    when { environment name: 'FULLSCAN', value: 'true' }
+                    steps {
+                        withCredentials([string(credentialsId: 'sipse.polaris.synopsys.com', variable: 'POLARIS_ACCESS_TOKEN')]) {
+                            script {
+                                status = sh returnStatus: true, script: """
+                                    curl -fLOsS $POLARIS_SERVER_URL/api/tools/polaris_cli-linux64.zip
+                                    unzip -qo -d $WORKSPACE_TMP -jo polaris_cli-linux64.zip && rm -f polaris_cli-linux64.zip
+                                    $WORKSPACE_TMP/polaris --co project.name=$PROJECT analyze -w
+                                    # simple quality gate for critical and high impact issues; more advanced filtering requires an API script
+                                    if [ \$(cat .synopsys/polaris/cli-scan.json | jq '[.issueSummary.issuesBySeverity|.critical,.high]|add') -ne 0 ]; then exit 8; fi
+                                """
+                                if (status == 8) { unstable 'policy violation' }
+                                else if (status != 0) { error 'scan failure' }
+                            }
+                        }
+                    }
+                }
+                stage('Coverity on Polaris PR Scan') {
+                    when { environment name: 'PRSCAN', value: 'true' }
+                    steps {
+                        withCredentials([string(credentialsId: 'sipse.polaris.synopsys.com', variable: 'POLARIS_ACCESS_TOKEN')]) {
+                            script {
+                                status = sh returnStatus: true, script: """
+                                    curl -fLOsS $POLARIS_SERVER_URL/api/tools/polaris_cli-linux64.zip
+                                    unzip -qo -d $WORKSPACE_TMP -jo polaris_cli-linux64.zip && rm -f polaris_cli-linux64.zip
+                                    $WORKSPACE_TMP/polaris --co project.name=$PROJECT analyze -w
+                                    # query for new issues; will always be non-zero for PRs; replace with API script to compare with CHANGE_TARGET
+                                    if [ \$(cat .synopsys/polaris/cli-scan.json | jq '.issueSummary.newIssues') -ne 0 ]; then exit 8; fi
+                                """
+                                if (status == 8) { unstable 'policy violation' }
+                                else if (status != 0) { error 'scan failure' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            when { environment name: 'PRODUCTION', value: 'true' }
+            steps {
+                sh 'mvn -B -DskipTests install'
             }
         }
     }
-
     post {
         always {
-            // Archive Results/Logs
-            // archiveArtifacts artifacts: '**/*-results*.json', allowEmptyArchive: 'true'
-
-            script {
-                // Remove the state json file as it has sensitive information
-                if (fileExists('io_state.json')) {
-                    sh 'rm io_state.json'
-                }
-            }
+            archiveArtifacts allowEmptyArchive: true, artifacts: '.synopsys/polaris/configuration/synopsys.yml, .synopsys/polaris/data/coverity/*/idir/build-log.txt, *_BlackDuck_RiskReport.pdf'
+            //zip archive: true, dir: '.bridge', zipFile: 'bridge-logs.zip'
+            cleanWs()
         }
     }
 }
