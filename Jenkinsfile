@@ -70,7 +70,7 @@ pipeline {
     agent any
 
     environment {
-        ioPOCId = 'IO_ACCESS_TOKEN'
+        ioPOCId = 'IO-AUTH-TOKEN'
         gitHubPOCId = 'OZ_GITHUB_TOKEN'
         polarisConfigName = 'polaris-token'
         blackDuckPOCId = 'BLACK_DUCK_AUTH_TOKEN'
