@@ -2,43 +2,43 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 // File Enviroment
-def fileProjectName = 'io-insecure-bank'
+def fileProjectName = 'OZ-io-insecure-bank'
 def fileBranchName = 'master'
 // IO Environment
-def ioPOCId = 'IO_TOKEN'
-def ioProjectName = 'io-insecure-bank'
+def ioPOCId = 'IO_OZ_TOKEN'
+def ioProjectName = 'OZ-io-insecure-bank'
 def ioWorkflowEngineVersion = '2022.7.2'
 def ioServerURL = "https://io.codedx.synopsys.com/"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
 // SCM - GitHub
-def gitHubPOCId = 'GITHUB_TOKEN'
+def gitHubPOCId = 'OZ_GITHUB_TOKEN'
 def gitHubOwner = 'OzViper'
 def scmBranch = fileBranchName
 def scmRepoName = 'insecure-bank'
 def scmRevisionDate = ''
 
 // AST - Polaris
-def polarisConfigName = 'POLARIS_ACCESS_TOKEN'
+def polarisConfigName = 'polaris-token'
 def polarisProjectName = fileProjectName
 def polarisBranchName = fileBranchName
 
 // AST - Black Duck
-def blackDuckPOCId = 'BRIDGE_BLACKDUCK_TOKEN'
+def blackDuckPOCId = 'BlackDuck-AuthToken'
 def blackDuckProjectName = fileProjectName
 def blackDuckProjectVersion = fileBranchName
 
 // BTS Configuration
-def jiraAssignee = 'johnd'
-def jiraConfigName = 'JIRA_TOKEN'
+def jiraAssignee = 'SIG User'
+def jiraConfigName = 'DEMO_JIRA_TOKEN'
 def jiraIssueQuery = 'resolution=Unresolved'
-def jiraProjectKey = 'INBANK'
-def jiraProjectName = 'INBANK'
+def jiraProjectKey = 'IO_Demo'
+def jiraProjectName = 'IODEMO'
 
 // Code Dx Configuration
-def codeDxConfigName = 'CODEDX_TOKEN'
-def codeDxProjectId = '2'
-def codeDxInstnceURL = 'https://poc263.codedx.synopsys.com/codedx'
+def codeDxConfigName = 'CODEDX_API_KEY'
+def codeDxProjectId = '137'
+def codeDxInstnceURL = 'https://demo.codedx.synopsys.com/codedx'
 def codeDxProjectAPI = '/api/projects/'
 def codeDxAnalysisEndpoint = '/analysis'
 def codeDxProjectContext = codeDxProjectId + ';branch=' + fileBranchName
