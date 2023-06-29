@@ -66,7 +66,7 @@ pipeline {
     agent any
 
     tools {
-        maven ''
+        maven 'maven'
     }
 
     stages {
