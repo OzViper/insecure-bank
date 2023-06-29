@@ -7,8 +7,8 @@ def fileBranchName = 'master'
 // IO Environment
 def ioPOCId = 'IO_TOKEN'
 def ioProjectName = fileProjectName
-def ioWorkflowEngineVersion = '2023.3.0'
-def ioServerURL = "https://io263.codedx.synopsys.com"
+def ioWorkflowEngineVersion = '2022.7.2'
+def ioServerURL = "https://io.codedx.synopsys.com/"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
 // SCM - GitHub
