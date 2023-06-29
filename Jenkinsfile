@@ -19,19 +19,19 @@ pipeline {
         // SCM - GitHub
         def gitHubPOCId = credentials('OZ_GITHUB_TOKEN')
         def gitHubOwner = 'OzViper'
-        def scmBranch = fileBranchName
+        def scmBranch = 'fileBranchName'
         def scmRepoName = 'insecure-bank'
         def scmRevisionDate = ''
 
         // AST - Polaris
         def polarisConfigName = credentials('polaris-token')
-        def polarisProjectName = fileProjectName
-        def polarisBranchName = fileBranchName
+        def polarisProjectName = 'fileProjectName'
+        def polarisBranchName = 'fileBranchName'
 
         // AST - Black Duck
         def blackDuckPOCId = credentials('BLACK_DUCK_AUTH_TOKEN')
-        def blackDuckProjectName = fileProjectName
-        def blackDuckProjectVersion = fileBranchName
+        def blackDuckProjectName = 'fileProjectName'
+        def blackDuckProjectVersion = 'fileBranchName'
 
         // BTS Configuration
         def jiraAssignee = 'SIG User'
