@@ -62,12 +62,10 @@ pipeline {
     agent any
 
     environment {
-        ioPOCId = credentials('IO-AUTH-TOKEN')
         gitHubPOCId = credentials('OZ_GITHUB_TOKEN')
         polarisConfigName = credentials('polaris-token')
         blackDuckPOCId = credentials('BlackDuck-AuthToken')
         jiraConfigName = credentials('DEMO_JIRA_TOKEN')
-        codeDxConfigName = credentials('CODEDX_API_KEY')
     }
     
     tools {
@@ -85,7 +83,7 @@ pipeline {
         // Get prescription from IO
         stage('Prescription') {
             environment {
-                IO_ACCESS_TOKEN = credentials("${ioPOCId}")
+                IO_ACCESS_TOKEN = credentials("${IO-AUTH-TOKEN}")
             }
             steps {
                 synopsysIO(connectors: [
@@ -196,7 +194,7 @@ pipeline {
         // Run IO's Workflow Engine
         stage('Workflow') {
             environment {
-                CODEDX_ACCESS_TOKEN = credentials("${codeDxConfigName}")
+                CODEDX_ACCESS_TOKEN = credentials("${CODEDX_API_KEY}")
             }
             steps {
                 script {
