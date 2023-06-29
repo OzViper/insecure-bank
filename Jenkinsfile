@@ -68,10 +68,7 @@ def breakBuild
 
 pipeline {
     agent any
-
-    environment {
     }
-
     tools {
         maven 'maven-3'
     }
