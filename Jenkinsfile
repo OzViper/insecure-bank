@@ -8,8 +8,8 @@ def fileBranchName = 'master'
 // IO Environment
 def ioProjectName = 'OZ-io-insecure-bank'
 def ioWorkflowEngineVersion = '2022.7.2'
-def ioServerURL = "https://io.codedx.synopsys.com/"
-def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
+def ioServerURL = 'https://io.codedx.synopsys.com/'
+def ioRunAPI = '/api/ioiq/api/orchestration/runs/'
 
 // SCM - GitHub
 def gitHubOwner = 'OzViper'
