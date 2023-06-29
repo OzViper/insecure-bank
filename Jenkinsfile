@@ -6,38 +6,32 @@ def fileProjectName = 'OZ-io-insecure-bank'
 def fileBranchName = 'master'
 
 // IO Environment
-// def ioPOCId = 'IO_ACCESS_TOKEN'
 def ioProjectName = 'OZ-io-insecure-bank'
 def ioWorkflowEngineVersion = '2022.7.2'
 def ioServerURL = "https://io.codedx.synopsys.com/"
 def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 
 // SCM - GitHub
-// def gitHubPOCId = 'OZ_GITHUB_TOKEN'
 def gitHubOwner = 'OzViper'
-def scmBranch = '${fileBranchName}'
+def scmBranch = fileBranchName
 def scmRepoName = 'insecure-bank'
 def scmRevisionDate = ''
 
 // AST - Polaris
-// def polarisConfigName = 'polaris-token'
-def polarisProjectName = '${fileProjectName}'
-def polarisBranchName = '${fileBranchName}'
+def polarisProjectName = fileProjectName
+def polarisBranchName = fileBranchName
 
 // AST - Black Duck
-// def blackDuckPOCId = 'BLACK_DUCK_AUTH_TOKEN'
-def blackDuckProjectName = '${fileProjectName}'
-def blackDuckProjectVersion = '${fileBranchName}'
+def blackDuckProjectName = fileProjectName
+def blackDuckProjectVersion = fileBranchName
 
 // BTS Configuration
 def jiraAssignee = 'SIG User'
-// def jiraConfigName = 'DEMO_JIRA_TOKEN'
 def jiraIssueQuery = 'resolution=Unresolved'
 def jiraProjectKey = 'IO_Demo'
 def jiraProjectName = 'IODEMO'
 
 // Code Dx Configuration
-// def codeDxConfigName = 'CODEDX_API_KEY'
 def codeDxProjectId = '137'
 def codeDxInstnceURL = 'https://demo.codedx.synopsys.com/codedx'
 def codeDxProjectAPI = '/api/projects/'
