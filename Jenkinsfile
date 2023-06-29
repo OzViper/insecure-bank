@@ -15,19 +15,19 @@ def ioRunAPI = "/api/ioiq/api/orchestration/runs/"
 // SCM - GitHub
 // def gitHubPOCId = 'OZ_GITHUB_TOKEN'
 def gitHubOwner = 'OzViper'
-def scmBranch = 'fileBranchName'
+def scmBranch = ${fileBranchName}
 def scmRepoName = 'insecure-bank'
 def scmRevisionDate = ''
 
 // AST - Polaris
 // def polarisConfigName = 'polaris-token'
-def polarisProjectName = 'fileProjectName'
-def polarisBranchName = 'fileBranchName'
+def polarisProjectName = ${fileProjectName}
+def polarisBranchName = ${fileBranchName}
 
 // AST - Black Duck
 // def blackDuckPOCId = 'BLACK_DUCK_AUTH_TOKEN'
-def blackDuckProjectName = 'fileProjectName'
-def blackDuckProjectVersion = 'fileBranchName'
+def blackDuckProjectName = ${fileProjectName}
+def blackDuckProjectVersion = ${fileBranchName}
 
 // BTS Configuration
 def jiraAssignee = 'SIG User'
@@ -42,8 +42,8 @@ def codeDxProjectId = '137'
 def codeDxInstnceURL = 'https://demo.codedx.synopsys.com/codedx'
 def codeDxProjectAPI = '/api/projects/'
 def codeDxAnalysisEndpoint = '/analysis'
-def codeDxProjectContext = 'codeDxProjectId + ';branch=' + fileBranchName'
-def codeDxBranchAnalysisAPI = 'codeDxInstnceURL + codeDxProjectAPI + codeDxProjectId + codeDxAnalysisEndpoint'
+def codeDxProjectContext = "${codeDxProjectId};branch=${fileBranchName}"
+def codeDxBranchAnalysisAPI = codeDxInstnceURL + codeDxProjectAPI + codeDxProjectId + codeDxAnalysisEndpoint
 
 // Notification Configuration
 def slackConfigName = ''
@@ -68,10 +68,10 @@ pipeline {
     agent any
 
     environment {
-        ioPOCId = credentials('IO_ACCESS_TOKEN')
+        ioPOCId = credentials('IO-AUTH-TOKEN')
         gitHubPOCId = credentials('OZ_GITHUB_TOKEN')
         polarisConfigName = credentials('polaris-token')
-        blackDuckPOCId = credentials('BLACK_DUCK_AUTH_TOKEN')
+        blackDuckPOCId = credentials('BlackDuck-AuthToken')
         jiraConfigName = credentials('DEMO_JIRA_TOKEN')
         codeDxConfigName = credentials('CODEDX_API_KEY')
     }
