@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
 def fileProjectName = 'OZ-io-insecure-bank'
 def fileBranchName = 'master'
 // IO Environment
-def ioPOCId = 'IO_OZ_TOKEN'
+def ioPOCId = 'IO-AUTH-TOKEN'
 def ioProjectName = 'OZ-io-insecure-bank'
 def ioWorkflowEngineVersion = '2022.7.2'
 def ioServerURL = "https://io.codedx.synopsys.com/"
