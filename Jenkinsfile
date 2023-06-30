@@ -6,6 +6,7 @@ def fileProjectName = 'OZ-io-insecure-bank'
 def fileBranchName = 'master'
 
 // IO Environment
+def ioPOCId = 'io-poc-demo'
 def ioProjectName = 'OZ-io-insecure-bank'
 def ioWorkflowEngineVersion = '2022.7.2'
 def ioServerURL = 'https://io.codedx.synopsys.com/'
