@@ -22,6 +22,7 @@ def polarisProjectName = fileProjectName
 def polarisBranchName = fileBranchName
 
 // AST - Black Duck
+def blackDuckURL = "https://testing.blackduck.synopsys.com"
 def blackDuckProjectName = fileProjectName
 def blackDuckProjectVersion = fileBranchName
 
@@ -33,9 +34,9 @@ def jiraProjectName = 'IODEMO'
 
 // Code Dx Configuration
 def codeDxProjectId = '137'
-def codeDxInstnceURL = 'https://demo.codedx.synopsys.com/codedx'
-def codeDxProjectAPI = '/api/projects/'
-def codeDxAnalysisEndpoint = '/analysis'
+def codeDxInstnceURL = "https://demo.codedx.synopsys.com/codedx"
+def codeDxProjectAPI = "/api/projects/"
+def codeDxAnalysisEndpoint = "/analysis"
 def codeDxProjectContext = "${codeDxProjectId};branch=${fileBranchName}"
 def codeDxBranchAnalysisAPI = codeDxInstnceURL + codeDxProjectAPI + codeDxProjectId + codeDxAnalysisEndpoint
 
@@ -66,6 +67,8 @@ pipeline {
         polarisConfigName = credentials('polaris-token')
         blackDuckPOCId = credentials('BlackDuck-AuthToken')
         jiraConfigName = credentials('DEMO_JIRA_TOKEN')
+        IO_ACCESS_TOKEN = credentials("${IO-AUTH-TOKEN}")
+        CODEDX_ACCESS_TOKEN = credentials("${CODEDX_API_KEY}")
     }
     
     tools {
@@ -82,9 +85,7 @@ pipeline {
 
         // Get prescription from IO
         stage('Prescription') {
-            environment {
-                IO_ACCESS_TOKEN = credentials("${IO-AUTH-TOKEN}")
-            }
+            
             steps {
                 synopsysIO(connectors: [
                     io(
@@ -170,7 +171,7 @@ pipeline {
                 expression { isSCAEnabled }
             }
             steps {
-                echo 'Running SCA using Blac kDuck'
+                echo 'Running SCA using BlackDuck'
                 synopsysIO(connectors: [
                     blackduck(
                         configName: blackDuckPOCId,
@@ -193,9 +194,7 @@ pipeline {
 
         // Run IO's Workflow Engine
         stage('Workflow') {
-            environment {
-                CODEDX_ACCESS_TOKEN = credentials("${CODEDX_API_KEY}")
-            }
+            
             steps {
                 script {
                     print("========================== Code Dx Branch Analysis ============================")
