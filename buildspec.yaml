@@ -1,0 +1,76 @@
+version: 0.2
+
+env:
+  shell: bash
+  secrets-manager:
+    IO_TOKEN: "IO_ACCESS_TOKEN"
+    POLARIS_TOKEN: "POLARIS_AUTH"
+    GITHUB_ACCESS: "GITHUB_TOKEN"
+    BLACKDUCK_TOKEN: "BLACKDUCK_AUTH"
+    
+  variables:
+    SYNOPSYS_IO_Workflow_Engine_Version : '2022.4.1'
+    SYNOPSYS_IO_io_server_token: $IO_TOKEN
+    SYNOPSYS_IO_project_name: 'aws-io-sample'
+    SYNOPSYS_IO_io_server_url: 'https://io10.codedx.synopsys.com'
+    SYNOPSYS_IO_persona_type: devsecops
+    SYNOPSYS_IO_polaris_instanceurl: 'https://sipse.polaris.synopsys.com'
+    SYNOPSYS_IO_polaris_authtoken: $POLARIS_AUTH
+    SYNOPSYS_IO_polaris_projectName: 'aws-insecure-bank'
+    SYNOPSYS_IO_sigma_downloadurl: <sigma_download_url>
+    SYNOPSYS_IO_Jira_HostUrl: <jira_host_url>
+    SYNOPSYS_IO_Jira_Username: <jira_user_name>
+    SYNOPSYS_IO_Jira_AuthToken: ${{secrets.JIRA_AUTH_TOKEN}}
+    SYNOPSYS_IO_Jira_IssueType: <jira_issue_type>
+    SYNOPSYS_IO_Jira_Project_Key: <jira_project_key>
+    SYNOPSYS_IO_Jira_Assignee: <jira_assignee>
+    SYNOPSYS_IO_slack_channelIdentifier: ${{secrets.SLACK_ID}}
+    SYNOPSYS_IO_slack_bearerToken: ${{secrets.SLACK_TOKEN}}
+    SYNOPSYS_IO_jira_issuesquery: <jira_issues_query>
+    SYNOPSYS_IO_jira_project_name: <jira_projet_name>
+    SYNOPSYS_IO_scm_type: github
+    SYNOPSYS_IO_scm_owner: ozviper
+    SYNOPSYS_IO_scm_repository_name: 'insecure-bank'
+    SYNOPSYS_IO_scm_repository_branch_name: AWS
+    SYNOPSYS_IO_github_token: $GITHUB_TOKEN
+    SYNOPSYS_IO_github_username: ozviper
+    SYNOPSYS_IO_github_apiUrl: 'https://api.github.com/repos'
+    SYNOPSYS_IO_project_release_type: <project_release_type>
+    SYNOPSYS_IO_Blackduck_AuthToken: $BLACKDUCK_AUTH
+    SYNOPSYS_IO_Blackduck_ProjectName: 'aws-insecure-bank'
+    SYNOPSYS_IO_Blackduck_InstanceUrl: 'https://testing.blackduck.synopsys.com'
+    SYNOPSYS_IO_Blackduck_ProjectVersion: aws
+    SYNOPSYS_IO_Coverity_InstanceUrl: <coverity_instance_url>
+    SYNOPSYS_IO_Coverity_Username: ${{secrets.COVERITY_USERNAME}}
+    SYNOPSYS_IO_Coverity_Password: ${{secrets.COVERITY_PASSWORD}}
+    SYNOPSYS_IO_Coverity_Stream: <coverity_stream>
+    SYNOPSYS_IO_Coverity_FilePath: <coverity_filepath>
+
+    Runner_OS_Type: linux64
+    ioClientVersion: "0.1.629"
+
+phases:
+  install:
+    commands:
+      - echo ================Getting IO =======================
+      - echo ==== Synopsys Intelligent Security Scan ==========
+      - echo ================ stage io ========================
+      - |
+        if [ ! -d "io_client-$ioClientVersion-$Runner_OS_Type" ]; then
+          wget -O io_client-$ioClientVersion-$Runner_OS_Type.zip "$IO_SERVER_URL/api/ioiq/api/downloads/io-client?extension=zip&platform=$Runner_OS_Type"
+          unzip io_client-$ioClientVersion-$Runner_OS_Type.zip
+        fi
+  
+  pre_build:
+    commands:
+      - echo ======= IO Prescription Stage =============
+      - |
+        io_client-$ioClientVersion-$Runner_OS_Type/io --stage io
+        echo "==================================== IO Risk Score ======================================="
+  build:
+    commands:
+      - echo ================Build Maven Package and Docker Image================
+      
+artifacts:
+   files:
+     - '**/*'

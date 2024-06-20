@@ -1,10 +1,10 @@
 version: "1"
 project:
-  name: ${scm.git.repo}
+  name: ${polaris_projectname}
   branch: master
   revision:
-    name: ${scm.git.commit}
-    date: ${scm.git.commit.date}
+    name: 
+    date: 
 capture:
   coverity:
     buildless:
